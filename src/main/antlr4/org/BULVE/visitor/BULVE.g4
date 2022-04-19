@@ -71,17 +71,17 @@ numericMultiOp : '*' | '/' | '%' ;
 
 numericAddOp : '+' | '-' ;
 
-stringBinaryOp : '..' ; //concat
+stringBinaryOp : '+' ; //sujungti du strings
 
 PRINT : 'print';
 
-INTEGER : [0-9]+ ; //TODO - support negative numbers
-DECIMAL : [0-9]+ '.' [0-9]+ ;
+INTEGER : [-][0-9]+ | [0-9]+ ; //TODO - support negative numbers - done?
+DECIMAL : [-][0-9]+ '.' [0-9]+ | [0-9]+ '.' [0-9]+ ;
 BOOLEAN : 'true' | 'false' ;
 STRING : ["] ( ~["\r\n\\] | '\\' ~[\r\n] )* ["] ;
 
-IDENTIFIER : [a-zA-Z_][a-zA-Z_0-9]* ;
+IDENTIFIER : [a-zA-Z_][a-zA-Z_0-9]* ; //var name
 
 COMMENT : ( '//' ~[\r\n]* | '/*' .*? '*/' ) -> skip ;
 
-WS : [ \t\f\r\n]+ -> skip ;
+WS : [ \t\f\r\n]+ -> skip ; //whitespace ir tt
