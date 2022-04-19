@@ -1,4 +1,4 @@
-# glang-visitor
+# BULVE-visitor
 Simple programing language created with ANTLR4 Visitor.
 
 #### Tools
