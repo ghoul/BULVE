@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="glang-1.0.jar" type="JarApplication">
+    <option name="JAR_PATH" value="$PROJECT_DIR$/target/glang-1.0.jar" />
+    <option name="PROGRAM_PARAMETERS" value="samples/test.glang" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <method v="2" />
+  </configuration>
+</component>
