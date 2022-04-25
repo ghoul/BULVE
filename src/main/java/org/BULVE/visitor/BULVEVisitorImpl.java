@@ -1,5 +1,7 @@
 package org.BULVE.visitor;
 
+import org.antlr.v4.runtime.tree.ParseTree;
+
 import java.util.Stack;
 
 public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
@@ -44,7 +46,23 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     @Override
     public Object visitVariableDeclaration(BULVEParser.VariableDeclarationContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
-        Object value = visit(ctx.expression());
+        Object value = visit(ctx.expression()); //cia expression, o jei integer butent?
+        this.currentScope.declareVariable(varName, value);
+        return null;
+    }
+
+    @Override
+    public Object visitIntegerDeclaration(BULVEParser.IntegerDeclarationContext ctx) {
+        String varName = ctx.IDENTIFIER().getText();
+        Integer value = Integer.parseInt(ctx.INTEGER().getText()) ;
+        this.currentScope.declareVariable(varName, value);
+        return null;
+    }
+
+    @Override
+    public Object visitStringDeclaration(BULVEParser.StringDeclarationContext ctx) {
+        String varName = ctx.IDENTIFIER().getText();
+        String value = ctx.STRING().toString() ;
         this.currentScope.declareVariable(varName, value);
         return null;
     }
@@ -52,10 +70,39 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     @Override
     public Object visitAssignment(BULVEParser.AssignmentContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
-        Object value = visit(ctx.expression());
+        Object value = visit(ctx.expression()); //jeigu pvz a=a-1, tai vistiek visada i a eis, kaip cia rekursija padaryt?
         this.currentScope.changeVariable(varName, value);
         return null;
     }
+
+    @Override
+    public Object visitDecimalDeclaration(BULVEParser.DecimalDeclarationContext ctx) {
+        String varName = ctx.IDENTIFIER().getText();
+        Double value = Double.parseDouble(ctx.DECIMAL().toString());
+        this.currentScope.declareVariable(varName, value);
+        return null;
+    }
+
+    @Override
+    public Object visitBoolDeclaration(BULVEParser.BoolDeclarationContext ctx) {
+        String varName = ctx.IDENTIFIER().getText();
+        Boolean value = Boolean.parseBoolean( ctx.BOOLEAN().toString());
+        this.currentScope.declareVariable(varName, value);
+        return null;
+    }
+
+    /* int a = 1;
+    @Override
+    public Object visitAssignmentExpression(BULVEParser.AssignmentExpressionContext ctx) {
+        String varName = ctx.IDENTIFIER().getText();
+        Integer value = (Integer)visit(ctx.expression(0));
+        if(visit(ctx.expression(a))!=null)
+        {
+            a++;
+            visitAssignmentExpression(ctx);
+        }
+        return null;
+    }*/
 
     @Override
     public Object visitIdentifierExpression(BULVEParser.IdentifierExpressionContext ctx) {
@@ -111,5 +158,32 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     @Override
     public Object visitParenthesesExpression(BULVEParser.ParenthesesExpressionContext ctx) {
         return visit(ctx.expression());
+    }
+
+    @Override
+    public Object visitKolStatement(BULVEParser.KolStatementContext ctx) {
+        boolean value = (Boolean) visit(ctx.expression());
+        if (value) {
+            visit(ctx.block());
+            visitKolStatement(ctx);
+        } else {
+            return null;
+        }
+        return null;
+    }
+
+    @Override
+    public Object visitNumericCompareOpExpresion(BULVEParser.NumericCompareOpExpresionContext ctx) {
+        Object val1 = visit(ctx.expression(0));
+        Object val2 = visit(ctx.expression(1));
+        return switch (ctx.numericCompareOp().getText()) {
+            case ">" -> (Integer) val1 > (Integer)val2;
+            case "<" -> (Integer) val1 < (Integer) val2;
+            case ">=" -> (Integer) val1 >= (Integer) val2;
+            case "<=" -> (Integer) val1 <= (Integer) val2;
+            case "==" -> (Integer) val1 == (Integer) val2;
+            case "!=" -> (Integer) val1 != (Integer) val2;
+            default -> null;
+        };
     }
 }

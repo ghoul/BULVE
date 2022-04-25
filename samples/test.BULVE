@@ -1,0 +1,30 @@
+sveikuolis a = 3
+siulas b = "bananas"
+dvigubas c = 2.45
+artikrai d = true
+
+print(a)
+print(b)
+print(c)
+print(d)
+
+//kol(a>0)
+/*{
+    print(a)
+    //a=a-1
+    //a=a-1
+}*/
+
+
+/*print(a)
+  if(a==0)
+  {
+  b=false
+  }
+  else
+  {
+  print(b)
+  }
+ */
+
+

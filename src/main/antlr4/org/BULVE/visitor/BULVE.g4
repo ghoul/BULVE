@@ -11,12 +11,16 @@ line
 
 statement
  : variableDeclaration
+ | integerDeclaration
+ | stringDeclaration
+ | decimalDeclaration
+ | boolDeclaration
  | assignment
  | functionCall
  | systemFunctionCall
  | ifElseStatement
- | kolStatement
  | visiemsStatement
+ | kolStatement
  ;
 
 functionDeclaration
@@ -29,14 +33,27 @@ functionBody : '{' statement* 'return' expression '}' ; //TODO cannot return fro
 
 variableDeclaration
  : 'var' IDENTIFIER '=' expression
- | 'sveikuolis' IDENTIFIER '=' INTEGER
- | 'siulas' IDENTIFIER '=' STRING
- | 'dvigubas' IDENTIFIER '=' DECIMAL
- | 'artikrai' IDENTIFIER '=' BOOLEAN
  ;
 
+integerDeclaration
+: 'sveikuolis' IDENTIFIER '=' INTEGER  //nesupranta kazkodel
+;
+
+stringDeclaration
+: 'siulas' IDENTIFIER '=' STRING
+;
+
+decimalDeclaration
+: 'dvigubas' IDENTIFIER '=' DECIMAL
+;
+
+boolDeclaration
+: 'artikrai' IDENTIFIER '=' BOOLEAN
+;
+
 assignment
- : IDENTIFIER '=' expression
+ : IDENTIFIER '=' expression    //#assignmentExpression //+ kaip padaryt, akd eitu a=a-1 priskirt?
+ //| IDENTIFIER '=' expression*
  ;
 
 functionCall
@@ -47,12 +64,12 @@ systemFunctionCall
  : PRINT '(' expression ')'                             #printFunctionCall
  ;
 
-ifElseStatement : 'if' '(' expression ')' block 'else' block ;
+ifElseStatement : 'jeigu' '(' expression ')' block 'kitaip' block ;
 
-kolStatement : 'kol' '(' BOOLEAN ')' block;
+kolStatement : 'kol' '(' expression ')' block;
 
-visiemsStatement : 'visiems' '(' 'sveikuolis' IDENTIFIER '=' INTEGER ';' BOOLEAN ';'
-                       IDENTIFIER '=' IDENTIFIER numericAddOp|numericMultiOp INTEGER|DECIMAL ')' block ;
+visiemsStatement : 'visiems' '(' 'sveikuolis' IDENTIFIER '=' INTEGER ';' expression ';'
+                       IDENTIFIER '=' expression ')' block ; //IDENTIFIER numericAddOp|numericMultiOp INTEGER|DECIMAL ')'
 
 block : '{' statement* '}' ;
 
@@ -71,6 +88,7 @@ expression
  | expression numericMultiOp expression                 #numericMultiOpExpression
  | expression numericAddOp expression                   #numericAddOpExpression
  | expression stringBinaryOp expression                 #stringBinaryOpExpression
+ | expression numericCompareOp expression               #numericCompareOpExpresion
  | functionCall                                         #functionCallExpression
  ;
 
@@ -81,6 +99,8 @@ booleanBinaryOp : '||' | '&&' ;
 numericMultiOp : '*' | '/' | '%' ;
 
 numericAddOp : '+' | '-' ;
+
+numericCompareOp : '>' | '<' | '<=' | '>=' | '==' | '!=' ;
 
 stringBinaryOp : '+' ; //sujungti du strings
 
