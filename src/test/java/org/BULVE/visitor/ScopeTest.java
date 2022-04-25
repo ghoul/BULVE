@@ -1,3 +1,4 @@
+/*
 package org.BULVE.visitor;
 
 import org.antlr.v4.runtime.CharStreams;
@@ -139,4 +140,4 @@ public class ScopeTest {
 
         assertEquals("Variable 'a' is not declared.", thrown.getMessage());
     }
-}
+}*/

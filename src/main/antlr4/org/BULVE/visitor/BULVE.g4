@@ -15,6 +15,8 @@ statement
  | functionCall
  | systemFunctionCall
  | ifElseStatement
+ | kolStatement
+ | visiemsStatement
  ;
 
 functionDeclaration
@@ -27,6 +29,10 @@ functionBody : '{' statement* 'return' expression '}' ; //TODO cannot return fro
 
 variableDeclaration
  : 'var' IDENTIFIER '=' expression
+ | 'sveikuolis' IDENTIFIER '=' INTEGER
+ | 'siulas' IDENTIFIER '=' STRING
+ | 'dvigubas' IDENTIFIER '=' DECIMAL
+ | 'artikrai' IDENTIFIER '=' BOOLEAN
  ;
 
 assignment
@@ -42,6 +48,11 @@ systemFunctionCall
  ;
 
 ifElseStatement : 'if' '(' expression ')' block 'else' block ;
+
+kolStatement : 'kol' '(' BOOLEAN ')' block;
+
+visiemsStatement : 'visiems' '(' 'sveikuolis' IDENTIFIER '=' INTEGER ';' BOOLEAN ';'
+                       IDENTIFIER '=' IDENTIFIER numericAddOp|numericMultiOp INTEGER|DECIMAL ')' block ;
 
 block : '{' statement* '}' ;
 

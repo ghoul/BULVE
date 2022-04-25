@@ -2,7 +2,7 @@ package org.BULVE.visitor;
 
 import java.util.Stack;
 
-public class BULVEVisitorImpl extends GLangBaseVisitor<Object> {
+public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
 
     private final StringBuilder SYSTEM_OUT = new StringBuilder();
 
@@ -11,13 +11,13 @@ public class BULVEVisitorImpl extends GLangBaseVisitor<Object> {
     private BULVEScope currentScope = new BULVEScope();
 
     @Override
-    public Object visitProgram(GLangParser.ProgramContext ctx) {
+    public Object visitProgram(BULVEParser.ProgramContext ctx) {
         super.visitProgram(ctx);
         return SYSTEM_OUT.toString();
     }
 
     @Override
-    public Object visitPrintFunctionCall(GLangParser.PrintFunctionCallContext ctx) {
+    public Object visitPrintFunctionCall(BULVEParser.PrintFunctionCallContext ctx) {
         String text = visit(ctx.expression()).toString();
         System.out.println(text);
         SYSTEM_OUT.append(text).append("\n");
@@ -25,12 +25,12 @@ public class BULVEVisitorImpl extends GLangBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitConstantExpression(GLangParser.ConstantExpressionContext ctx) {
+    public Object visitConstantExpression(BULVEParser.ConstantExpressionContext ctx) {
         return visit(ctx.constant());
     }
 
     @Override
-    public Object visitConstant(GLangParser.ConstantContext ctx) {
+    public Object visitConstant(BULVEParser.ConstantContext ctx) {
         if (ctx.INTEGER() != null) {
             return Integer.parseInt(ctx.INTEGER().getText());
         }
@@ -42,7 +42,7 @@ public class BULVEVisitorImpl extends GLangBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitVariableDeclaration(GLangParser.VariableDeclarationContext ctx) {
+    public Object visitVariableDeclaration(BULVEParser.VariableDeclarationContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
         Object value = visit(ctx.expression());
         this.currentScope.declareVariable(varName, value);
@@ -50,7 +50,7 @@ public class BULVEVisitorImpl extends GLangBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitAssignment(GLangParser.AssignmentContext ctx) {
+    public Object visitAssignment(BULVEParser.AssignmentContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
         Object value = visit(ctx.expression());
         this.currentScope.changeVariable(varName, value);
@@ -58,13 +58,13 @@ public class BULVEVisitorImpl extends GLangBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitIdentifierExpression(GLangParser.IdentifierExpressionContext ctx) {
+    public Object visitIdentifierExpression(BULVEParser.IdentifierExpressionContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
         return this.currentScope.resolveVariable(varName);
     }
 
     @Override
-    public Object visitNumericAddOpExpression(GLangParser.NumericAddOpExpressionContext ctx) {
+    public Object visitNumericAddOpExpression(BULVEParser.NumericAddOpExpressionContext ctx) {
         Object val1 = visit(ctx.expression(0));
         Object val2 = visit(ctx.expression(1));
         //TODO - validation etc
@@ -76,7 +76,7 @@ public class BULVEVisitorImpl extends GLangBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitNumericMultiOpExpression(GLangParser.NumericMultiOpExpressionContext ctx) {
+    public Object visitNumericMultiOpExpression(BULVEParser.NumericMultiOpExpressionContext ctx) {
         Object val1 = visit(ctx.expression(0));
         Object val2 = visit(ctx.expression(1));
         //TODO - validation etc
@@ -89,7 +89,7 @@ public class BULVEVisitorImpl extends GLangBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitIfElseStatement(GLangParser.IfElseStatementContext ctx) {
+    public Object visitIfElseStatement(BULVEParser.IfElseStatementContext ctx) {
         boolean value = (Boolean) visit(ctx.expression());
         if (value) {
             visit(ctx.block(0));
@@ -100,7 +100,7 @@ public class BULVEVisitorImpl extends GLangBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitBlock(GLangParser.BlockContext ctx) {
+    public Object visitBlock(BULVEParser.BlockContext ctx) {
         scopeStack.push(currentScope);
         currentScope = new BULVEScope(currentScope);
         super.visitBlock(ctx);
@@ -109,7 +109,7 @@ public class BULVEVisitorImpl extends GLangBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitParenthesesExpression(GLangParser.ParenthesesExpressionContext ctx) {
+    public Object visitParenthesesExpression(BULVEParser.ParenthesesExpressionContext ctx) {
         return visit(ctx.expression());
     }
 }

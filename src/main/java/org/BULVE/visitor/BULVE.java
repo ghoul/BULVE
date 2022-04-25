@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
+import java.util.*;
 
 public class BULVE {
     public static void main(String[] args) {
@@ -15,8 +16,8 @@ public class BULVE {
     }
 
     public static Object execute(CharStream stream) {
-        GLangLexer lexer = new GLangLexer(stream);
-        GLangParser parser = new GLangParser(new CommonTokenStream(lexer));
+        BULVELexer lexer = new BULVELexer(stream);
+        BULVEParser parser = new BULVEParser(new CommonTokenStream(lexer));
         parser.setBuildParseTree(true);
         ParseTree tree = parser.program();
 
