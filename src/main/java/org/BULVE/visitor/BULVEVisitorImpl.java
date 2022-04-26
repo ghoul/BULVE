@@ -1,7 +1,6 @@
 package org.BULVE.visitor;
 
 import org.BULVE.visitor.exception.BULVEBadTypeException;
-import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.Stack;
 
@@ -57,9 +56,17 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     @Override
     public Object visitIntegerDeclaration(BULVEParser.IntegerDeclarationContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
-        Integer value = Integer.parseInt(ctx.INTEGER().getText()) ; //TODO:sudet exceptions jei ne tas type
-        this.currentScope.declareVariable(varName, value);
-        return value;
+        try{
+            //TODO:sudet exceptions jei ne tas type, bet meta klaidas pats antlr, netinka java exeptions
+            Integer value = Integer.parseInt(ctx.INTEGER().getText()) ;
+            this.currentScope.declareVariable(varName, value);
+            return value;
+        }
+        catch (BULVEBadTypeException ex)
+        {
+            throw new BULVEBadTypeException(varName);
+        }
+
     }
 
     @Override
@@ -235,5 +242,21 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
             default:  return null;
         }
 
+    }
+
+    //TODO implement nested functions
+    @Override
+    public Object visitFunctionDeclaration(BULVEParser.FunctionDeclarationContext ctx) {
+        return super.visitFunctionDeclaration(ctx);
+    }
+
+    @Override
+    public Object visitFunctionBody(BULVEParser.FunctionBodyContext ctx) {
+        return super.visitFunctionBody(ctx);
+    }
+
+    @Override
+    public Object visitFunctionCall(BULVEParser.FunctionCallContext ctx) {
+        return super.visitFunctionCall(ctx);
     }
 }

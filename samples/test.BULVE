@@ -28,10 +28,11 @@ a=a+1
 }
 print(a)*/
 
-visiems(sveikuolis f=10; f>5;f=f--1)
+/*visiems(sveikuolis f=10; f>5;f=f--1)
 {
 print(f)
-}
+}*/
 
- //nera return dar niekur
+//break;return dar pridet
 
+sveikuolis a = 2.5

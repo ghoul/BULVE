@@ -23,7 +23,7 @@ statement
  | kolStatement
  ;
 
-functionDeclaration
+functionDeclaration //TODO:vėliau ir tipą turės nurodyt gal
  : 'func' IDENTIFIER '(' paramList? ')' functionBody
  ;
 
@@ -105,11 +105,11 @@ numericCompareOp : '>' | '<' | '<=' | '>=' | '==' | '!=' ;
 
 stringBinaryOp : '+' ; //sujungti du strings
 
-PRINT : 'print';
+PRINT : 'print'; //spausdink
 
 INTEGER : [-][0-9]+ | [0-9]+ ; //TODO - support negative numbers - done?
 DECIMAL : [-][0-9]+ '.' [0-9]+ | [0-9]+ '.' [0-9]+ ;
-BOOLEAN : 'true' | 'false' ;
+BOOLEAN : 'true' | 'false' ; //tiesa|melas
 STRING : ["] ( ~["\r\n\\] | '\\' ~[\r\n] )* ["] ;
 
 IDENTIFIER : [a-zA-Z_][a-zA-Z_0-9]* ; //var name
