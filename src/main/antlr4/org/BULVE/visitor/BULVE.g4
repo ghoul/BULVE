@@ -52,8 +52,8 @@ boolDeclaration
 ;
 
 assignment
- : IDENTIFIER '=' expression    //#assignmentExpression //+ kaip padaryt, akd eitu a=a-1 priskirt?
- //| IDENTIFIER '=' expression*
+ : IDENTIFIER '=' expression    //#assignmentExpression //+ neina mazint variables, nes minusa skaito kaip neigiama skaiciu
+ //TODO:padaryt, kad jei randa minusini variable, darytu sudeti su minusiniu skaicium? ir jeigu -5+2 nesupranta
  ;
 
 functionCall
@@ -80,9 +80,11 @@ expressionList
  ;
 
 expression
+
  : constant                                             #constantExpression
  | IDENTIFIER                                           #identifierExpression
  | '(' expression ')'                                   #parenthesesExpression
+ //| numericAddOp                                         #numericAddOpExpTest
  | booleanUnaryOp expression                            #booleanUnaryOpExpression
  | expression booleanBinaryOp expression                #booleanBinaryOpExpression
  | expression numericMultiOp expression                 #numericMultiOpExpression
@@ -98,7 +100,7 @@ booleanBinaryOp : '||' | '&&' ;
 
 numericMultiOp : '*' | '/' | '%' ;
 
-numericAddOp : '+' | '-' ;
+numericAddOp : '+' | '--' ;
 
 numericCompareOp : '>' | '<' | '<=' | '>=' | '==' | '!=' ;
 

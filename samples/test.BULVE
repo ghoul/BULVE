@@ -1,20 +1,32 @@
-sveikuolis a = 3
+sveikuolis a = 5
 siulas b = "bananas"
 dvigubas c = 2.45
 artikrai d = true
+
+sveikuolis e = 5  //--2 neveikia, galima tik paskui keiciant reiksme daryt veiksmus
+e=e--2
 
 print(a)
 print(b)
 print(c)
 print(d)
+print(e)
 
-//kol(a>0)
-/*{
+kol(a>0) //veikia ir + ir --
+{
     print(a)
-    //a=a-1
-    //a=a-1
-}*/
+    a=a--1
+}
 
+jeigu(a>2)
+{
+a=a+10  //padaryt, kad jei sudeda int su decimal gautusi decimal
+}
+kitaip
+{
+a=a+1
+}
+print(a)
 
 /*print(a)
   if(a==0)
