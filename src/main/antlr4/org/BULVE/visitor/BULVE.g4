@@ -36,7 +36,7 @@ variableDeclaration
  ;
 
 integerDeclaration
-: 'sveikuolis' IDENTIFIER '=' INTEGER  //nesupranta kazkodel
+: 'sveikuolis' IDENTIFIER '=' INTEGER
 ;
 
 stringDeclaration
@@ -68,8 +68,8 @@ ifElseStatement : 'jeigu' '(' expression ')' block 'kitaip' block ;
 
 kolStatement : 'kol' '(' expression ')' block;
 
-visiemsStatement : 'visiems' '(' 'sveikuolis' IDENTIFIER '=' INTEGER ';' expression ';'
-                       IDENTIFIER '=' expression ')' block ; //IDENTIFIER numericAddOp|numericMultiOp INTEGER|DECIMAL ')'
+visiemsStatement : 'visiems' '(' integerDeclaration';' IDENTIFIER numericCompareOp expression ';'
+                       assignment ')' block ;
 
 block : '{' statement* '}' ;
 
@@ -84,7 +84,6 @@ expression
  : constant                                             #constantExpression
  | IDENTIFIER                                           #identifierExpression
  | '(' expression ')'                                   #parenthesesExpression
- //| numericAddOp                                         #numericAddOpExpTest
  | booleanUnaryOp expression                            #booleanUnaryOpExpression
  | expression booleanBinaryOp expression                #booleanBinaryOpExpression
  | expression numericMultiOp expression                 #numericMultiOpExpression

@@ -1,4 +1,4 @@
-sveikuolis a = 5
+/*sveikuolis a = 5
 siulas b = "bananas"
 dvigubas c = 2.45
 artikrai d = true
@@ -26,17 +26,12 @@ kitaip
 {
 a=a+1
 }
-print(a)
+print(a)*/
 
-/*print(a)
-  if(a==0)
-  {
-  b=false
-  }
-  else
-  {
-  print(b)
-  }
- */
+visiems(sveikuolis f=10; f>5;f=f--1)
+{
+print(f)
+}
 
+ //nera return dar niekur
 

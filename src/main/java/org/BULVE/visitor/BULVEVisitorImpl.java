@@ -13,6 +13,8 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
 
     private BULVEScope currentScope = new BULVEScope();
 
+    private BULVEScope globalScope = new BULVEScope(); //gal reikes funkcijom ateity
+
     @Override
     public Object visitProgram(BULVEParser.ProgramContext ctx) {
         super.visitProgram(ctx);
@@ -47,7 +49,7 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     @Override
     public Object visitVariableDeclaration(BULVEParser.VariableDeclarationContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
-        Object value = visit(ctx.expression()); //cia expression, o jei integer butent?
+        Object value = visit(ctx.expression());
         this.currentScope.declareVariable(varName, value);
         return null;
     }
@@ -57,7 +59,7 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
         String varName = ctx.IDENTIFIER().getText();
         Integer value = Integer.parseInt(ctx.INTEGER().getText()) ; //TODO:sudet exceptions jei ne tas type
         this.currentScope.declareVariable(varName, value);
-        return null;
+        return value;
     }
 
     @Override
@@ -71,9 +73,9 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     @Override
     public Object visitAssignment(BULVEParser.AssignmentContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
-        Object value = visit(ctx.expression()); //jeigu pvz a=a-1, tai vistiek visada i a eis, kaip cia rekursija padaryt?
+        Object value = visit(ctx.expression());
         this.currentScope.changeVariable(varName, value);
-        return null;
+        return value;
     }
 
     @Override
@@ -181,5 +183,57 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
             case "!=" -> (Integer) val1 != (Integer) val2;
             default -> null;
         };
+    }
+
+    @Override
+    public Object visitVisiemsStatement(BULVEParser.VisiemsStatementContext ctx) {
+
+        Integer counterStart = (Integer) visit(ctx.integerDeclaration());
+        String ident = ctx.IDENTIFIER().getText();
+        String op = ctx.numericCompareOp().getText();
+        Integer bound = (Integer) visit(ctx.expression());
+        Integer counterIncrease = (Integer) visit(ctx.assignment()) - counterStart; //nzn ar gerai, gal grazina visa reiksme, tai atimt reikes
+        switch (op)
+        {
+            case "<":
+            {
+                for(int i=counterStart; i<bound; i+=counterIncrease)
+                {
+                    //perduoda f i reiksme, nes cia i keiciasi, o ten f ne, tik pirma karta
+                    this.currentScope.changeVariable(ident, i);
+                    visit(ctx.block());
+                }
+                return null;
+            }
+            case ">":
+            {
+                for(int i=counterStart; i>bound; i+=counterIncrease)
+                {
+                    this.currentScope.changeVariable(ident, i);
+                    visit(ctx.block());
+                }
+                return null;
+            }
+            case ">=":
+            {
+                for(int i=counterStart; i>=bound; i+=counterIncrease)
+                {
+                    this.currentScope.changeVariable(ident, i);
+                    visit(ctx.block());
+                }
+                return null;
+            }
+            case "<=":
+            {
+                for(int i=counterStart; i<=bound; i+=counterIncrease)
+                {
+                    this.currentScope.changeVariable(ident, i);
+                    visit(ctx.block());
+                }
+                return null;
+            }
+            default:  return null;
+        }
+
     }
 }
