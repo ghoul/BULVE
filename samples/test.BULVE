@@ -4,15 +4,33 @@ dvigubas c = 2.45
 artikrai d = true
 
 sveikuolis e = 5  //--2 neveikia, galima tik paskui keiciant reiksme daryt veiksmus
-e=e--2
+e=e--2*/
+
+/*func plius(sveikuolis a,sveikuolis b){ //kaip padaryt, kad nereiketu rasyt veliau tu tipu kvieciant?
+
+ return a+b
+}*/
+
+func plius(a,b){
+ sveikuolis c = a+b
+ return a+b
+ }
+
+print(plius(2,5))
+
+//print(plius(1, plius(2, plius(3,4))))
+return
 
 print(a)
 print(b)
 print(c)
+return
 print(d)
 print(e)
 
-kol(a>0) //veikia ir + ir --
+
+
+/* kol(a>0) //veikia ir + ir --
 {
     print(a)
     a=a--1
@@ -35,4 +53,4 @@ print(f)
 
 //break;return dar pridet
 
-sveikuolis a = 2.5
+sveikuolis a = 2

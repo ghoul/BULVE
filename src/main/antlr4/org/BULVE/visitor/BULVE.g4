@@ -16,27 +16,39 @@ statement
  | decimalDeclaration
  | boolDeclaration
  | assignment
+ | functionDeclaration
  | functionCall
  | systemFunctionCall
  | ifElseStatement
  | visiemsStatement
  | kolStatement
+ | returnStatment
+
  ;
 
-functionDeclaration //TODO:vėliau ir tipą turės nurodyt gal
- : 'func' IDENTIFIER '(' paramList? ')' functionBody
+functionDeclaration
+ : 'func ' IDENTIFIER '(' paramList? ')' functionBody // type IDENTIFIER
  ;
 
-paramList : IDENTIFIER (',' IDENTIFIER)* ;
+paramList :  IDENTIFIER (','  IDENTIFIER)* //type
+;
 
-functionBody : '{' statement* 'return' expression '}' ; //TODO cannot return from the midle of function
+type
+: 'var'
+| 'siulas'
+| 'sveikuolis'
+| 'dvigubas'
+| 'artikrai'
+;
+
+functionBody : '{' statement*   '}' ; //expression*
 
 variableDeclaration
  : 'var' IDENTIFIER '=' expression
  ;
 
 integerDeclaration
-: 'sveikuolis' IDENTIFIER '=' INTEGER
+: 'sveikuolis' IDENTIFIER '=' INTEGER | expression //kaip uztikrint kad int expression?
 ;
 
 stringDeclaration
@@ -55,16 +67,18 @@ assignment
  : IDENTIFIER '=' expression    //#assignmentExpression //+ neina mazint variables, nes minusa skaito kaip neigiama skaiciu
  //TODO:padaryt, kad jei randa minusini variable, darytu sudeti su minusiniu skaicium? ir jeigu -5+2 nesupranta
  ;
-
+returnStatment
+: 'return' expression?
+;
 functionCall
- : IDENTIFIER '(' expressionList? ')'
+ : IDENTIFIER '(' expressionList? ')' //a=a--1
  ;
 
 systemFunctionCall
  : PRINT '(' expression ')'                             #printFunctionCall
  ;
 
-ifElseStatement : 'jeigu' '(' expression ')' block 'kitaip' block ;
+ifElseStatement : 'jeigu' '(' expression ')' block ('kitaip' block)? ;
 
 kolStatement : 'kol' '(' expression ')' block;
 
@@ -79,9 +93,10 @@ expressionList
  : expression (',' expression)*
  ;
 
-expression
+expression //a=a-1
 
  : constant                                             #constantExpression
+ |type                                                  #typeExpression
  | IDENTIFIER                                           #identifierExpression
  | '(' expression ')'                                   #parenthesesExpression
  | booleanUnaryOp expression                            #booleanUnaryOpExpression
