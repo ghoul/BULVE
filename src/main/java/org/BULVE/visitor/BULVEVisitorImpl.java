@@ -141,7 +141,7 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
         }
         return value;
     }
-
+    //TODO, kad jei sudeda int su decimal gautusi decimal, dar gal ++ su strings
     @Override
     public Object visitNumericAddOpExpression(BULVEParser.NumericAddOpExpressionContext ctx) {
         Object val1 = visit(ctx.expression(0));

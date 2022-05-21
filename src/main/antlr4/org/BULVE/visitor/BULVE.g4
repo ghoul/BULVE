@@ -68,7 +68,7 @@ assignment
  : IDENTIFIER '=' expression    //#assignmentExpression
  ;
 returnStatment
-: 'return' expression?
+: 'grazink' expression?
 ;
 functionCall
  : IDENTIFIER '(' expressionList? ')' //nestedExpressionList?  //a=a--1
@@ -128,11 +128,11 @@ numericCompareOp : '>' | '<' | '<=' | '>=' | '==' | '!=' ;
 
 stringBinaryOp : '+' ; //sujungti du strings
 
-PRINT : 'print'; //spausdink
+PRINT : 'spausdink'; //spausdink
 
 INTEGER : [-][0-9]+ | [0-9]+ ; //TODO - support negative numbers - done?
 DECIMAL : [-][0-9]+ '.' [0-9]+ | [0-9]+ '.' [0-9]+ ;
-BOOLEAN : 'true' | 'false' ; //tiesa|melas
+BOOLEAN : 'tiesa' | 'melas' ; //tiesa|melas
 STRING : ["] ( ~["\r\n\\] | '\\' ~[\r\n] )* ["] ;
 
 IDENTIFIER : [&]?[a-zA-Z_][a-zA-Z_0-9]* ; //var name

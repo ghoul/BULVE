@@ -1,33 +1,58 @@
+sveikuolis a = 5
+siulas b = "bananas"
+dvigubas c = 2.45
+artikrai d = tiesa
+a=a--2
+
+spausdink(a)
+spausdink(b)
+spausdink(c)
+spausdink(d)
+
 
 sveikuolis du = 2
 
-func didinti(sveikuolis &a){
+func didinti(sveikuolis &a, sveikuolis b, sveikuolis c){ //su dvigubas bandyt veliau
      kol(a<10){
      a=a+1
+     b=b*2
+     c=c*3
      }
-     return a
+     grazink c
 }
 
-sveikuolis padidintas = didinti(du)
-siulas ats = "Atsakymas"
-print(ats)
-print(padidintas)
+sveikuolis padidintasC = didinti(du, 5, 2)
+siulas ats = "Atsakymas c="
+spausdink(ats)
+spausdink(padidintasC)
 
-dvigubas storulis = 5.5
-print(storulis)
-print(5)
+jeigu(a>2)
+{
+a=a+10
+}
+kitaip
+{
+a=a+1
+}
+spausdink("a po jeigu")
+spausdink(a)
+
+visiems(sveikuolis f=10; f>5;f=f--1)
+{
+a=a--1
+}
+
+spausdink("a po visiems")
+spausdink(a)
 
 
 
 
 
-/*sveikuolis a = 5
-siulas b = "bananas"
-dvigubas c = 2.45
-artikrai d = true
 
-sveikuolis e = 5  //--2 neveikia, galima tik paskui keiciant reiksme daryt veiksmus
-e=e--2*/
+
+
+
 
 /*func plius(sveikuolis a,sveikuolis b){ //kaip padaryt, kad nereiketu rasyt veliau tu tipu kvieciant?
 
@@ -52,38 +77,4 @@ print(plius(2,5,10))*/
 //plius(2,5)
 
 //print(plius(1, plius(2, plius(3,4))))
-return
 
-print(a)
-print(b)
-print(c)
-return
-print(d)
-print(e)
-
-
-
-/* kol(a>0) //veikia ir + ir --
-{
-    print(a)
-    a=a--1
-}
-
-jeigu(a>2)
-{
-a=a+10  //padaryt, kad jei sudeda int su decimal gautusi decimal
-}
-kitaip
-{
-a=a+1
-}
-print(a)*/
-
-/*visiems(sveikuolis f=10; f>5;f=f--1)
-{
-print(f)
-}*/
-
-//break;return dar pridet
-
-sveikuolis a = 2
