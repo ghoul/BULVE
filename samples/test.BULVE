@@ -1,3 +1,26 @@
+
+sveikuolis du = 2
+
+func didinti(sveikuolis &a){
+     kol(a<10){
+     a=a+1
+     }
+     return a
+}
+
+sveikuolis padidintas = didinti(du)
+siulas ats = "Atsakymas"
+print(ats)
+print(padidintas)
+
+dvigubas storulis = 5.5
+print(storulis)
+print(5)
+
+
+
+
+
 /*sveikuolis a = 5
 siulas b = "bananas"
 dvigubas c = 2.45
@@ -11,7 +34,7 @@ e=e--2*/
  return a+b
 }*/
 
-func plius(sveikuolis a, sveikuolis b, sveikuolis e){
+/*func plius(sveikuolis a, sveikuolis b, sveikuolis e){
  var c = a+b
  sveikuolis d = c+a
    func mult(d){
@@ -24,7 +47,7 @@ func plius(sveikuolis a, sveikuolis b, sveikuolis e){
         //}
  //print(a+b) taip negerai, print neveikia kazkodel
  }
-print(plius(2,5,10))
+print(plius(2,5,10))*/
 //print(mult(2))
 //plius(2,5)
 

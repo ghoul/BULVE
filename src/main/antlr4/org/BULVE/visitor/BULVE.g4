@@ -18,7 +18,7 @@ statement
  | assignment
  | functionDeclaration
  | functionCall
- | nestedFunctionCall
+ //| nestedFunctionCall
  | systemFunctionCall
  | ifElseStatement
  | visiemsStatement
@@ -28,7 +28,7 @@ statement
  ;
 
 functionDeclaration
- : 'func ' IDENTIFIER ('(' paramList? ')')+ functionBody // type IDENTIFIER
+ : 'func ' IDENTIFIER '(' paramList? ')' functionBody // type IDENTIFIER ('(' paramList? ')')+
  ;
 
 paramList : type? IDENTIFIER (','  type? IDENTIFIER)* //type?
@@ -49,19 +49,19 @@ variableDeclaration
  ;
 
 integerDeclaration
-: 'sveikuolis' IDENTIFIER '=' expression | INTEGER //INTEGER | expression //kaip uztikrint kad int expression?
+: 'sveikuolis' IDENTIFIER '=' expression //| INTEGER //INTEGER | expression //kaip uztikrint kad int expression?
 ;
 
 stringDeclaration
-: 'siulas' IDENTIFIER '=' expression |STRING
+: 'siulas' IDENTIFIER '=' expression //| STRING //expression |
 ;
 
 decimalDeclaration
-: 'dvigubas' IDENTIFIER '=' expression |DECIMAL
+: 'dvigubas' IDENTIFIER '=' expression //|DECIMAL
 ;
 
 boolDeclaration
-: 'artikrai' IDENTIFIER '=' expression |BOOLEAN
+: 'artikrai' IDENTIFIER '=' expression //|BOOLEAN
 ;
 
 assignment
@@ -71,11 +71,11 @@ returnStatment
 : 'return' expression?
 ;
 functionCall
- : IDENTIFIER '(' expressionList? ')' nestedExpressionList?  //a=a--1
+ : IDENTIFIER '(' expressionList? ')' //nestedExpressionList?  //a=a--1
  ;
-nestedFunctionCall
+/*nestedFunctionCall
 : IDENTIFIER('.'IDENTIFIER)+'('expressionList?')' //iskvietimas nested funkciju su parametrais jom duotais
-;
+;*/
 systemFunctionCall
  : PRINT '(' expression ')'                             #printFunctionCall
  ;
@@ -89,14 +89,19 @@ visiemsStatement : 'visiems' '(' integerDeclaration';' IDENTIFIER numericCompare
 
 block : '{' statement* '}' ;
 
-constant: INTEGER | DECIMAL | BOOLEAN |STRING ;
+constant
+: DECIMAL
+| INTEGER
+| BOOLEAN
+| STRING
+;
 
 expressionList
  : expression (',' expression)*
  ;
-nestedExpressionList
+/*nestedExpressionList
 : ('(' expressionList?')')* //is sito zinosim, ar yra nested funkciju - TODO nereikalingas isvis, nebent reiks, kad viska vykdyt reikes
-;
+;*/
 expression //a=a-1
  : constant                                             #constantExpression
  |type                                                  #typeExpression

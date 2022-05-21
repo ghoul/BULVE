@@ -13,8 +13,10 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
 
     private BULVEScope currentScope = new BULVEScope();
 
-    private BULVEScope functionsScope = new BULVEScope(); //gal reikes funkcijom ateity
-    private final Stack<BULVEScope> funcStack = new Stack<>();
+/*    private BULVEScope functionsScope = new BULVEScope(); //gal reikes funkcijom
+    private final Stack<BULVEScope> funcStack = new Stack<>();*/
+
+    private final List<String> specialArgs = new ArrayList<>();
 
     private final Map<String, BULVEParser.FunctionDeclarationContext> functions = new HashMap<>();
 
@@ -45,7 +47,12 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
         if (ctx.BOOLEAN() != null) {
             return Boolean.parseBoolean(ctx.BOOLEAN().getText());
         }
-        //TODO implement other types
+        if (ctx.DECIMAL() != null) {
+            return Double.parseDouble(ctx.DECIMAL().getText());
+        }
+        if (ctx.STRING() != null) {
+            return ctx.STRING().getText();
+        }
         return null;
     }
 
@@ -61,17 +68,9 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     public Object visitIntegerDeclaration(BULVEParser.IntegerDeclarationContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
         try{
-            if(ctx.INTEGER()!=null){
-            //TODO:sudet exceptions jei ne tas type, bet meta klaidas pats antlr, netinka java exeptions
-            Integer value = Integer.parseInt(ctx.INTEGER().getText()) ;
-            this.currentScope.declareVariable(varName, value);
-            return value;
-            }
-            else { //jei a+b pvz??? //TODO: NEPAIMA PADUOTU ARGUMENTU, KODEL RETURN PAIMA?
                 Integer value = Integer.parseInt(this.visit(ctx.expression()).toString());
                 this.currentScope.declareVariable(varName, value);
                 return value;
-            }
         }
         catch (BULVEBadTypeException ex)
         {
@@ -79,13 +78,19 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
         }
 
     }
-    //TODO:VISIEM DECLARATIONPAKEIST KAD EXPRESSION GALI BUT VIETOJ TIESIOGINIO ASSIGNMENT
+    //TODO:VISIEM DECLARATION TIKRINT AR TEISINGAI PRISKIRTAS TIPAS, exeption sitas netinka
     @Override
     public Object visitStringDeclaration(BULVEParser.StringDeclarationContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
-        String value = ctx.STRING().toString();
-        this.currentScope.declareVariable(varName, value);
-        return null;
+        try{
+                String value = this.visit(ctx.expression()).toString();
+                this.currentScope.declareVariable(varName, value);
+                return value;
+    }
+        catch (BULVEBadTypeException ex)
+        {
+            throw new BULVEBadTypeException(varName);
+        }
     }
 
     @Override
@@ -99,24 +104,42 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     @Override
     public Object visitDecimalDeclaration(BULVEParser.DecimalDeclarationContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
-        Double value = Double.parseDouble(ctx.DECIMAL().toString());
-        this.currentScope.declareVariable(varName, value);
-        return null;
+        try{
+                Double value = Double.parseDouble(this.visit(ctx.expression()).toString());
+                this.currentScope.declareVariable(varName, value);
+                return value;
+        }
+        catch (BULVEBadTypeException ex)
+        {
+            throw new BULVEBadTypeException(varName);
+        }
     }
 
     @Override
     public Object visitBoolDeclaration(BULVEParser.BoolDeclarationContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
-        Boolean value = Boolean.parseBoolean( ctx.BOOLEAN().toString());
+        try{
+        Boolean value = Boolean.parseBoolean(this.visit(ctx.expression()).toString());
         this.currentScope.declareVariable(varName, value);
-        return null;
-    }
+        return value;
+        }
+        catch (BULVEBadTypeException ex)
+            {
+                throw new BULVEBadTypeException(varName);
+            }
 
+    }
 
     @Override
     public Object visitIdentifierExpression(BULVEParser.IdentifierExpressionContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
-        return this.currentScope.resolveVariable(varName);
+
+        Object value = this.currentScope.resolveVariable(varName);
+        if(specialArgs.contains(varName))
+        {
+            System.out.println(varName+" = "+ value);
+        }
+        return value;
     }
 
     @Override
@@ -209,7 +232,7 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
         String ident = ctx.IDENTIFIER().getText();
         String op = ctx.numericCompareOp().getText();
         Integer bound = (Integer) visit(ctx.expression());
-        Integer counterIncrease = (Integer) visit(ctx.assignment()) - counterStart; //nzn ar gerai, gal grazina visa reiksme, tai atimt reikes
+        Integer counterIncrease = (Integer) visit(ctx.assignment()) - counterStart;
         switch (op)
         {
             case "<":
@@ -254,17 +277,11 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
 
     }
 
-/*    @Override
-    public Object visitParamList(BULVEParser.ParamListContext ctx) { //kaip aplankyt listą??? kai nezinai kiek yra
-        //kolkas bus su vienu parametru
-        //String type = ctx.type();
-        return super.visitParamList(ctx);
-    }*/
-//TODO - ValueType enum
-//TODO class Value (wraps value+type), return type accepts Value
-//TODO VOID return type
-//TODO Function class, with validation and invoke methods
-//TODO small visitor classes
+    //TODO - ValueType enum
+    //class Value (wraps value+type), return type accepts Value
+    //VOID return type
+    //Function class, with validation and invoke methods
+    // small visitor classes
     @Override
     public Object visitType(BULVEParser.TypeContext ctx) {
         return ctx.getText();
@@ -277,25 +294,15 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
 
 
         this.functions.put(funcName, ctx);
-        //String paramType = (String)visit(ctx.type());
-        //String paramName = (String)visit(ctx.IDENTIFIER(1));
-        //i scope idet parametrus?
-        //visit(ctx.functionBody()); //ir perduot parametrus paramName, paramType
-        //TODO: create function class that kas constructor(FunctionDeclarationContext), Invoke method
-        //TODO: validations?
-        return ctx; //super.visitFunctionDeclaration(ctx);
-        /*functionDeclaration
-           : 'func ' IDENTIFIER '(' TYPE identifier ')' functionBody
-           ;
+        // create function class that has constructor(FunctionDeclarationContext), Invoke method
+        // validations
+        return ctx;
 
-           paramList :  type IDENTIFIER (', ' type IDENTIFIER)* ;*/
     }
 
     @Override
     public Object visitFunctionBody(BULVEParser.FunctionBodyContext ctx) {
         Object value =  super.visitFunctionBody(ctx);
-        //if()//kaip patikrint ar visitina funcDeclaration?
-
         if(value instanceof returnValue)
         {
             return value;
@@ -307,26 +314,6 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     public Object visitFunctionCall(BULVEParser.FunctionCallContext ctx) {
         String funcName = ctx.IDENTIFIER().getText();
         BULVEParser.FunctionDeclarationContext func = this.functions.get(funcName);
-     /*   if(func.paramList().size()>1)
-        {
-            for(int i=0; i<func.paramList().size(); i++)
-            {
-                //visit kiekviena declaration kaip call perduodant parametrus is paramlist
-            }
-        }*/
-        if(funcName.charAt(funcName.length()-1) == 'P')
-        {
-            for(int i=0; i<func.paramList(0).IDENTIFIER().size();i++){
-                String ident = func.paramList(0).IDENTIFIER(i).getText();
-                if(ident.charAt(0)=='&')
-                {
-                    String identReal = ident.substring(1,ident.length()); //real varname
-                    currentScope.declareVariable(identReal, currentScope.resolveVariable(identReal)); //special TODO perkel i apacia turbut
-                }
-            }
-        }
-        //pasidaryt specialcharacters masyva global ir vis tikrintar identifier yra is special ir tada printint
-        //bet buna calle (5,2), bet viskas ok, juos kaip a ir b matys vistiek
 
         //TODO: check if args count is the same - ar istrauktoj funkcijoj toks pat kiekis kaip ir call'e
         List<Object> args = new ArrayList<>();
@@ -337,19 +324,26 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
                 args.add(this.visit(exp));
             }
         }
-        //TODO: validate args types nes dabar visi var
+        //TODO: validate args types
         BULVEScope functionScope = new BULVEScope();
         if(func.paramList()!=null) {
-            for (int i = 0; i < func.paramList(0).IDENTIFIER().size(); i++) { //TODO cia eina per ()()(), indeksas keist vis
-                String paramName = func.paramList(0).IDENTIFIER(i).getText();
-                functionScope.declareVariable(paramName, args.get(i)); //susieja declaration su call'o argumentais
+            for (int i = 0; i < func.paramList().IDENTIFIER().size(); i++) {
+                String paramName = func.paramList().IDENTIFIER(i).getText();
+                if(paramName.charAt(0)=='&')
+                {
+                    String identReal = paramName.substring(1); //real varname
+                    specialArgs.add(identReal);
+                    functionScope.declareVariable(identReal, args.get(i)); //special
+                }
+                else functionScope.declareVariable(paramName, args.get(i)); //susieja declaration su call'o argumentais
             }
         }
-        //TODO:sitoj vietoj scope kitoks jei funkcija funkcijoj? o gal ne
+        //sitoj vietoj scope kitoks jei funkcija funkcijoj? o gal ne
         scopeStack.push(currentScope);
         currentScope = functionScope;
         returnValue value = (returnValue)this.visitFunctionBody(func.functionBody());
         currentScope = scopeStack.pop();
+        specialArgs.clear();
         return value.getValue();
     }
 
@@ -357,30 +351,16 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     public Object visitReturnStatment(BULVEParser.ReturnStatmentContext ctx) {
         if(ctx.expression()==null)
         {
-            return new returnValue(null); //returnValue, nes agal sita tipa zino, ar reikai iseit is bloko
+            return new returnValue(null); //returnValue, nes pagal sita tipa zino, ar reikai iseit is bloko
         }
         else {
             return new returnValue(this.visit(ctx.expression()));
         }
     }
 
-   /* @Override
-    protected Object defaultResult() {
-        return super.defaultResult();
-    }
-
-    @Override
-    protected Object aggregateResult(Object aggregate, Object nextResult) {
-        return super.aggregateResult(aggregate, nextResult);
-    }*/
 
     @Override
     protected boolean shouldVisitNextChild(RuleNode node, Object currentResult) {
         return !(currentResult instanceof returnValue);
     }
 }
-  /*  String paramlist = (String)visit(ctx.paramList()); //TODO:kaip aplankyt sita? reikia dar tada type metodo??
-    String funcName = (String)visit(ctx.IDENTIFIER());
-        *//*String ident = ctx.IDENTIFIER().getText();
-        String op = ctx.numericCompareOp().getText();
-        Integer bound = (Integer) visit(ctx.expression());*/
