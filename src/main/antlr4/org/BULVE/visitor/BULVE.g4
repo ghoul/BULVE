@@ -18,6 +18,7 @@ statement
  | assignment
  | functionDeclaration
  | functionCall
+ | nestedFunctionCall
  | systemFunctionCall
  | ifElseStatement
  | visiemsStatement
@@ -27,10 +28,10 @@ statement
  ;
 
 functionDeclaration
- : 'func ' IDENTIFIER '(' paramList? ')' functionBody // type IDENTIFIER
+ : 'func ' IDENTIFIER ('(' paramList? ')')+ functionBody // type IDENTIFIER
  ;
 
-paramList :  IDENTIFIER (','  IDENTIFIER)* //type
+paramList : type? IDENTIFIER (','  type? IDENTIFIER)* //type?
 ;
 
 type
@@ -41,39 +42,40 @@ type
 | 'artikrai'
 ;
 
-functionBody : '{' statement*   '}' ; //expression*
+functionBody : '{'  statement* '}' ; //(expression* statement* expression*)*
 
 variableDeclaration
  : 'var' IDENTIFIER '=' expression
  ;
 
 integerDeclaration
-: 'sveikuolis' IDENTIFIER '=' INTEGER | expression //kaip uztikrint kad int expression?
+: 'sveikuolis' IDENTIFIER '=' expression | INTEGER //INTEGER | expression //kaip uztikrint kad int expression?
 ;
 
 stringDeclaration
-: 'siulas' IDENTIFIER '=' STRING
+: 'siulas' IDENTIFIER '=' expression |STRING
 ;
 
 decimalDeclaration
-: 'dvigubas' IDENTIFIER '=' DECIMAL
+: 'dvigubas' IDENTIFIER '=' expression |DECIMAL
 ;
 
 boolDeclaration
-: 'artikrai' IDENTIFIER '=' BOOLEAN
+: 'artikrai' IDENTIFIER '=' expression |BOOLEAN
 ;
 
 assignment
- : IDENTIFIER '=' expression    //#assignmentExpression //+ neina mazint variables, nes minusa skaito kaip neigiama skaiciu
- //TODO:padaryt, kad jei randa minusini variable, darytu sudeti su minusiniu skaicium? ir jeigu -5+2 nesupranta
+ : IDENTIFIER '=' expression    //#assignmentExpression
  ;
 returnStatment
 : 'return' expression?
 ;
 functionCall
- : IDENTIFIER '(' expressionList? ')' //a=a--1
+ : IDENTIFIER '(' expressionList? ')' nestedExpressionList?  //a=a--1
  ;
-
+nestedFunctionCall
+: IDENTIFIER('.'IDENTIFIER)+'('expressionList?')' //iskvietimas nested funkciju su parametrais jom duotais
+;
 systemFunctionCall
  : PRINT '(' expression ')'                             #printFunctionCall
  ;
@@ -92,9 +94,10 @@ constant: INTEGER | DECIMAL | BOOLEAN |STRING ;
 expressionList
  : expression (',' expression)*
  ;
-
+nestedExpressionList
+: ('(' expressionList?')')* //is sito zinosim, ar yra nested funkciju - TODO nereikalingas isvis, nebent reiks, kad viska vykdyt reikes
+;
 expression //a=a-1
-
  : constant                                             #constantExpression
  |type                                                  #typeExpression
  | IDENTIFIER                                           #identifierExpression
@@ -127,7 +130,7 @@ DECIMAL : [-][0-9]+ '.' [0-9]+ | [0-9]+ '.' [0-9]+ ;
 BOOLEAN : 'true' | 'false' ; //tiesa|melas
 STRING : ["] ( ~["\r\n\\] | '\\' ~[\r\n] )* ["] ;
 
-IDENTIFIER : [a-zA-Z_][a-zA-Z_0-9]* ; //var name
+IDENTIFIER : [&]?[a-zA-Z_][a-zA-Z_0-9]* ; //var name
 
 COMMENT : ( '//' ~[\r\n]* | '/*' .*? '*/' ) -> skip ;
 

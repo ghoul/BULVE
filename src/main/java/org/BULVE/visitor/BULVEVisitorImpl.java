@@ -13,7 +13,8 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
 
     private BULVEScope currentScope = new BULVEScope();
 
-    private BULVEScope globalScope = new BULVEScope(); //gal reikes funkcijom ateity
+    private BULVEScope functionsScope = new BULVEScope(); //gal reikes funkcijom ateity
+    private final Stack<BULVEScope> funcStack = new Stack<>();
 
     private final Map<String, BULVEParser.FunctionDeclarationContext> functions = new HashMap<>();
 
@@ -157,7 +158,7 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     public Object visitBlock(BULVEParser.BlockContext ctx) {
         scopeStack.push(currentScope);
         currentScope = new BULVEScope(currentScope);
-        Object value = visitBlock(ctx);
+        Object value = super.visitBlock(ctx);
         currentScope = scopeStack.pop();
         return value;
     }
@@ -273,6 +274,8 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     @Override
     public Object visitFunctionDeclaration(BULVEParser.FunctionDeclarationContext ctx) {
         String funcName = ctx.IDENTIFIER().getText();
+
+
         this.functions.put(funcName, ctx);
         //String paramType = (String)visit(ctx.type());
         //String paramName = (String)visit(ctx.IDENTIFIER(1));
@@ -280,7 +283,7 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
         //visit(ctx.functionBody()); //ir perduot parametrus paramName, paramType
         //TODO: create function class that kas constructor(FunctionDeclarationContext), Invoke method
         //TODO: validations?
-        return null; //super.visitFunctionDeclaration(ctx);
+        return ctx; //super.visitFunctionDeclaration(ctx);
         /*functionDeclaration
            : 'func ' IDENTIFIER '(' TYPE identifier ')' functionBody
            ;
@@ -291,6 +294,8 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     @Override
     public Object visitFunctionBody(BULVEParser.FunctionBodyContext ctx) {
         Object value =  super.visitFunctionBody(ctx);
+        //if()//kaip patikrint ar visitina funcDeclaration?
+
         if(value instanceof returnValue)
         {
             return value;
@@ -302,6 +307,27 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     public Object visitFunctionCall(BULVEParser.FunctionCallContext ctx) {
         String funcName = ctx.IDENTIFIER().getText();
         BULVEParser.FunctionDeclarationContext func = this.functions.get(funcName);
+     /*   if(func.paramList().size()>1)
+        {
+            for(int i=0; i<func.paramList().size(); i++)
+            {
+                //visit kiekviena declaration kaip call perduodant parametrus is paramlist
+            }
+        }*/
+        if(funcName.charAt(funcName.length()-1) == 'P')
+        {
+            for(int i=0; i<func.paramList(0).IDENTIFIER().size();i++){
+                String ident = func.paramList(0).IDENTIFIER(i).getText();
+                if(ident.charAt(0)=='&')
+                {
+                    String identReal = ident.substring(1,ident.length()); //real varname
+                    currentScope.declareVariable(identReal, currentScope.resolveVariable(identReal)); //special TODO perkel i apacia turbut
+                }
+            }
+        }
+        //pasidaryt specialcharacters masyva global ir vis tikrintar identifier yra is special ir tada printint
+        //bet buna calle (5,2), bet viskas ok, juos kaip a ir b matys vistiek
+
         //TODO: check if args count is the same - ar istrauktoj funkcijoj toks pat kiekis kaip ir call'e
         List<Object> args = new ArrayList<>();
         if(ctx.expressionList()!=null)
@@ -314,9 +340,9 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
         //TODO: validate args types nes dabar visi var
         BULVEScope functionScope = new BULVEScope();
         if(func.paramList()!=null) {
-            for (int i = 0; i < func.paramList().IDENTIFIER().size(); i++) {
-                String paramName = func.paramList().IDENTIFIER(i).toString();
-                functionScope.declareVariable(paramName, args.get(i));
+            for (int i = 0; i < func.paramList(0).IDENTIFIER().size(); i++) { //TODO cia eina per ()()(), indeksas keist vis
+                String paramName = func.paramList(0).IDENTIFIER(i).getText();
+                functionScope.declareVariable(paramName, args.get(i)); //susieja declaration su call'o argumentais
             }
         }
         //TODO:sitoj vietoj scope kitoks jei funkcija funkcijoj? o gal ne

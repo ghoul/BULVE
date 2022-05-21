@@ -11,12 +11,22 @@ e=e--2*/
  return a+b
 }*/
 
-func plius(a,b){
- sveikuolis c = a+b
- return a+b
+func plius(sveikuolis a, sveikuolis b, sveikuolis e){
+ var c = a+b
+ sveikuolis d = c+a
+   func mult(d){
+      d =d*d
+      //return d*d
+  }
+ return d
+ //func minus(a,b){
+        //return (a--b)
+        //}
+ //print(a+b) taip negerai, print neveikia kazkodel
  }
-
-print(plius(2,5))
+print(plius(2,5,10))
+//print(mult(2))
+//plius(2,5)
 
 //print(plius(1, plius(2, plius(3,4))))
 return
