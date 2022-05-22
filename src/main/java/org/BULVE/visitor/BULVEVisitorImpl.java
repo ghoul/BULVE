@@ -17,9 +17,6 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
 
     private BULVEScope currentScope = new BULVEScope();
 
-/*    private BULVEScope functionsScope = new BULVEScope(); //gal reikes funkcijom
-    private final Stack<BULVEScope> funcStack = new Stack<>();*/
-
     private final List<String> specialArgs = new ArrayList<>();
 
     private final Map<String, BULVEParser.FunctionDeclarationContext> functions = new HashMap<>();
@@ -82,7 +79,7 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
         else throw new BULVEBadTypeException(varName);
 
     }
-    //TODO:VISIEM DECLARATION TIKRINT AR TEISINGAI PRISKIRTAS TIPAS, exeption sitas netinka
+
     @Override
     public Object visitStringDeclaration(BULVEParser.StringDeclarationContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
@@ -225,10 +222,16 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     @Override
     public Object visitIntArrayDeclaration(BULVEParser.IntArrayDeclarationContext ctx) {
         String arrName = ctx.IDENTIFIER().getText();
-            Integer size = Integer.parseInt(ctx.INTEGER().getText());
+        Object value = this.visit(ctx.expression());
+        if(value instanceof Integer)
+        {
+            Integer size = Integer.parseInt(value.toString());
             int[] arr = new int[size];
             this.currentScope.declareVariable(arrName, arr);
             return arr;
+        }
+        else throw new BULVEArrayDeclarationExeption(arrName);
+
     }
 
     @Override
@@ -350,7 +353,6 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
             {
                 for(int i=counterStart; i<bound; i+=counterIncrease)
                 {
-                    //perduoda f i reiksme, nes cia i keiciasi, o ten f ne, tik pirma karta
                     this.currentScope.changeVariable(ident, i);
                     visit(ctx.block());
                 }
@@ -388,11 +390,7 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
 
     }
 
-    //TODO - ValueType enum
-    //class Value (wraps value+type), return type accepts Value
-    //VOID return type
-    //Function class, with validation and invoke methods
-    // small visitor classes
+
     @Override
     public Object visitType(BULVEParser.TypeContext ctx) {
         return ctx.getText();
@@ -402,10 +400,7 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     public Object visitFunctionDeclaration(BULVEParser.FunctionDeclarationContext ctx) {
         String funcName = ctx.IDENTIFIER().getText();
         this.functions.put(funcName, ctx);
-        // create function class that has constructor(FunctionDeclarationContext), Invoke method
-        // validations
         return ctx;
-
     }
 
     @Override
@@ -451,26 +446,26 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
                 Object arg = args.get(i);
                 if(paramName.charAt(0)=='&')
                 {
-                    String identReal = paramName.substring(1); //real varname
+                    String identReal = paramName.substring(1);
                     specialArgs.add(identReal);
                     if(type.equals("siulas")) {
                         if(arg instanceof String) {
-                            functionScope.declareVariable(identReal, args.get(i)); //special
+                            functionScope.declareVariable(identReal, args.get(i));
                         }
                         else throw new BULVEBadTypeException(identReal);}
                     else if(type.equals("sveikuolis")) {
                         if(arg instanceof Integer) {
-                            functionScope.declareVariable(identReal, args.get(i)); //special
+                            functionScope.declareVariable(identReal, args.get(i));
                         }
                         else throw new BULVEBadTypeException(identReal);}
                     else if(type.equals("dvigubas")) {
                         if(arg instanceof Double){
-                            functionScope.declareVariable(identReal, args.get(i)); //special
+                            functionScope.declareVariable(identReal, args.get(i));
                         }
                         else throw new BULVEBadTypeException(identReal);}
                     else if(type.equals("artikrai")) {
                         if(arg instanceof Boolean) {
-                            functionScope.declareVariable(identReal, args.get(i)); //special
+                            functionScope.declareVariable(identReal, args.get(i));
                         }
                         else throw new BULVEBadTypeException(identReal);}
                     else throw new BULVEFunctionParametersExeption(funcName);
@@ -510,7 +505,7 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     public Object visitReturnStatment(BULVEParser.ReturnStatmentContext ctx) {
         if(ctx.expression()==null)
         {
-            return new returnValue(null); //returnValue, nes pagal sita tipa zino, ar reikai iseit is bloko
+            return new returnValue(null);
         }
         else {
             return new returnValue(this.visit(ctx.expression()));

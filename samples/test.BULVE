@@ -15,6 +15,7 @@ spausdink(c)
 spausdink(d)
 
 sveikuolis[] vaikuciai = new sveikuolis[5]
+//sveikuolis[] blogiukai = new sveikuolis["penki"]
 vaikuciai[0]=50 //[10]
 spausdink("Pirmas vaikutis: "++vaikuciai[0])
 

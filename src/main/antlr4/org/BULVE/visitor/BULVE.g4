@@ -19,22 +19,20 @@ statement
  | assignment
  | functionDeclaration
  | functionCall
- //| nestedFunctionCall
  | systemFunctionCall
  | ifElseStatement
  | visiemsStatement
  | kolStatement
  | intArrayAdd
- //| intArrayRemove
  | returnStatment
 
  ;
 
 functionDeclaration
- : 'func ' IDENTIFIER '(' paramList? ')' functionBody // type IDENTIFIER ('(' paramList? ')')+
+ : 'func ' IDENTIFIER '(' paramList? ')' functionBody
  ;
 
-paramList : type? IDENTIFIER (','  type? IDENTIFIER)* //type?
+paramList : type IDENTIFIER (','  type IDENTIFIER)*
 ;
 
 type
@@ -45,30 +43,30 @@ type
 | 'artikrai'
 ;
 
-functionBody : '{'  statement* '}' ; //(expression* statement* expression*)*
+functionBody : '{'  statement* '}' ;
 
 variableDeclaration
  : 'var' IDENTIFIER '=' expression
  ;
 
 integerDeclaration
-: 'sveikuolis' IDENTIFIER '=' expression //| INTEGER //INTEGER | expression //kaip uztikrint kad int expression?
+: 'sveikuolis' IDENTIFIER '=' expression
 ;
 
 stringDeclaration
-: 'siulas' IDENTIFIER '=' expression //| STRING //expression |
+: 'siulas' IDENTIFIER '=' expression
 ;
 
 decimalDeclaration
-: 'dvigubas' IDENTIFIER '=' expression //|DECIMAL
+: 'dvigubas' IDENTIFIER '=' expression
 ;
 
 boolDeclaration
-: 'artikrai' IDENTIFIER '=' expression //|BOOLEAN
+: 'artikrai' IDENTIFIER '=' expression
 ;
 
 intArrayDeclaration
-: 'sveikuolis[]' IDENTIFIER '=' 'new sveikuolis['INTEGER']'
+: 'sveikuolis[]' IDENTIFIER '=' 'new sveikuolis['expression']'
 ;
 
 intArrayAdd
@@ -78,22 +76,17 @@ intArrayAdd
 intArrayGet
 : IDENTIFIER'['INTEGER']'
 ;
-/*intArrayRemove
-: IDENTIFIER'.ismesti('expression')'
-;*/
 
 assignment
- : IDENTIFIER '=' expression    //#assignmentExpression
+ : IDENTIFIER '=' expression
  ;
 returnStatment
 : 'grazink' expression?
 ;
 functionCall
- : IDENTIFIER '(' expressionList? ')' //nestedExpressionList?  //a=a--1
+ : IDENTIFIER '(' expressionList? ')'
  ;
-/*nestedFunctionCall
-: IDENTIFIER('.'IDENTIFIER)+'('expressionList?')' //iskvietimas nested funkciju su parametrais jom duotais
-;*/
+
 systemFunctionCall
  : PRINT '(' expression ')'                             #printFunctionCall
  ;
@@ -117,9 +110,7 @@ constant
 expressionList
  : expression (',' expression)*
  ;
-/*nestedExpressionList
-: ('(' expressionList?')')* //is sito zinosim, ar yra nested funkciju - TODO nereikalingas isvis, nebent reiks, kad viska vykdyt reikes
-;*/
+
 expression //a=a-1
  : constant                                             #constantExpression
  |type                                                  #typeExpression
@@ -149,7 +140,7 @@ stringBinaryOp : '++' ; //sujungti du strings
 
 PRINT : 'spausdink'; //spausdink
 
-INTEGER : [-][0-9]+ | [0-9]+ ; //TODO - support negative numbers - done?
+INTEGER : [-][0-9]+ | [0-9]+ ;
 DECIMAL : [-][0-9]+ '.' [0-9]+ | [0-9]+ '.' [0-9]+ ;
 BOOLEAN : 'true' | 'false' ; //tiesa|melas
 STRING : ["] ( ~["\r\n\\] | '\\' ~[\r\n] )* ["] ;
