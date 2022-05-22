@@ -72,12 +72,12 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     @Override
     public Object visitIntegerDeclaration(BULVEParser.IntegerDeclarationContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
-
-        if(this.visit(ctx.expression()) instanceof Integer)
+        Object value = this.visit(ctx.expression());
+        if(value instanceof Integer)
         {
-            Integer value = Integer.parseInt(this.visit(ctx.expression()).toString());
-            this.currentScope.declareVariable(varName, value);
-            return value;
+            Integer value1 = Integer.parseInt(value.toString());
+            this.currentScope.declareVariable(varName, value1);
+            return value1;
         }
         else throw new BULVEBadTypeException(varName);
 
@@ -102,11 +102,12 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     @Override
     public Object visitDecimalDeclaration(BULVEParser.DecimalDeclarationContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
-        if(this.visit(ctx.expression()) instanceof Double)
+        Object value = this.visit(ctx.expression());
+        if(value instanceof Double)
         {
-                Double value = Double.parseDouble(this.visit(ctx.expression()).toString());
-                this.currentScope.declareVariable(varName, value);
-                return value;
+                Double value1 = Double.parseDouble(value.toString());
+                this.currentScope.declareVariable(varName, value1);
+                return value1;
         }
         else throw new BULVEBadTypeException(varName);
     }
@@ -114,10 +115,11 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     @Override
     public Object visitBoolDeclaration(BULVEParser.BoolDeclarationContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
-        if(this.visit(ctx.expression()) instanceof Boolean) {
-            Boolean value = Boolean.parseBoolean(this.visit(ctx.expression()).toString());
-            this.currentScope.declareVariable(varName, value);
-            return value;
+        Object value = this.visit(ctx.expression());
+        if(value instanceof Boolean) {
+            Boolean value1 = Boolean.parseBoolean(value.toString());
+            this.currentScope.declareVariable(varName, value1);
+            return value1;
         }
         else throw new BULVEBadTypeException(varName);
     }
@@ -223,24 +225,19 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     @Override
     public Object visitIntArrayDeclaration(BULVEParser.IntArrayDeclarationContext ctx) {
         String arrName = ctx.IDENTIFIER().getText();
-        Object sizeo = ctx.INTEGER();
-        //if(sizeo instanceof Integer)
-        {
             Integer size = Integer.parseInt(ctx.INTEGER().getText());
             int[] arr = new int[size];
             this.currentScope.declareVariable(arrName, arr);
             return arr;
-        }
-        //else throw new BULVEArrayDeclarationExeption(arrName);
-
     }
 
     @Override
     public Object visitIntArrayAdd(BULVEParser.IntArrayAddContext ctx) {
         String arrName = ctx.IDENTIFIER().getText();
-        if(visit(ctx.expression()) instanceof Integer)
+        Object value = this.visit(ctx.expression());
+        if(value instanceof Integer)
         {
-            Integer value = Integer.parseInt(visit(ctx.expression()).toString());
+            Integer value1 = Integer.parseInt(value.toString());
             //pasiimt is scope
             int[] arr = (int[])this.currentScope.resolveVariable(arrName);
             int index = Integer.parseInt(ctx.INTEGER().getText());
@@ -249,7 +246,7 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
                 throw new BULVEIndexOutsideTheBoundsOfTheArray(arrName);
             }
             else{
-                arr[index]=value;
+                arr[index]=value1;
                 this.currentScope.changeVariable(arrName, arr);
             }
             return arr;
@@ -262,9 +259,6 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     public Object visitIntArrayGet(BULVEParser.IntArrayGetContext ctx) {
         String arrName = ctx.IDENTIFIER().getText();
         int[] arr = (int[])this.currentScope.resolveVariable(arrName);
-        //Object indexo = ctx.INTEGER();
-       // if(indexo instanceof Integer)
-        {
             int index = Integer.parseInt(ctx.INTEGER().getText());
             if(index>arr.length || index<0)
             {
@@ -273,14 +267,9 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
             else{
                 return arr[index];
             }
-
-        }
-        //else throw new BULVEBadTypeException(indexo.toString());
-
     }
 
 
-    //TODO: elseif
     @Override
     public Object visitIfElseStatement(BULVEParser.IfElseStatementContext ctx) {
         boolean value = (Boolean) visit(ctx.expression());
@@ -511,8 +500,9 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
         scopeStack.push(currentScope);
         currentScope = functionScope;
         returnValue value = (returnValue)this.visitFunctionBody(func.functionBody());
-        currentScope = scopeStack.pop();
         specialArgs.clear();
+        currentScope = scopeStack.pop();
+
         return value.getValue();
     }
 

@@ -20,20 +20,21 @@ spausdink("Pirmas vaikutis: "++vaikuciai[0])
 
 sveikuolis du = 2
 
-func didinti(sveikuolis &a, sveikuolis b, sveikuolis c){ //su dvigubas bandyt veliau
+func didinti(sveikuolis &a, dvigubas b, sveikuolis c){
      kol(a<10){
      a=a+1
-     b=b*2
+     b=b/2.5
      c=c*3
      }
+     spausdink("b = " ++b)
      grazink c
 }
 
 //didinti(5)
 
-sveikuolis padidintasC = didinti(du, 5, 2) //kodel 2 kartus spausdina?
-//siulas ats = "Atsakymas c = " ++ padidintasC
-//spausdink(ats)
+sveikuolis padidintasC = didinti(du, 500.00, 2)
+siulas ats = "Atsakymas c = " ++ padidintasC
+spausdink(ats)
 
 func tustute(){
   spausdink("nieko")
@@ -49,22 +50,20 @@ func maisalyne(sveikuolis a, siulas b){
 
 jeigu(a>2)
 {
-a=a+10
+  a=a+10
 }
 kitaip
 {
-a=a+1
+  a=a+1
 }
-spausdink("a po jeigu")
-spausdink(a)
+spausdink("a po jeigu: " ++ a)
 
 visiems(sveikuolis f=10; f>5;f=f--1)
 {
-a=a--1
+   a=a--1
 }
 
-spausdink("a po visiems")
-spausdink(a)
+spausdink("a po visiems: " ++a)
 
 
 
