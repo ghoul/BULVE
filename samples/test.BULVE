@@ -1,14 +1,22 @@
 sveikuolis a = 5
 siulas b = "bananas"
 dvigubas c = 2.45
-artikrai d = tiesa
+artikrai d = true
 a=a--2
+
+//sveikuolis ee = "du"
+
+spausdink(2+2.5)
+spausdink(5.5/5)
 
 spausdink(a)
 spausdink(b)
 spausdink(c)
 spausdink(d)
 
+sveikuolis[] vaikuciai = new sveikuolis[5]
+vaikuciai[0]=50 //[10]
+spausdink("Pirmas vaikutis: "++vaikuciai[0])
 
 sveikuolis du = 2
 
@@ -21,10 +29,23 @@ func didinti(sveikuolis &a, sveikuolis b, sveikuolis c){ //su dvigubas bandyt ve
      grazink c
 }
 
-sveikuolis padidintasC = didinti(du, 5, 2)
-siulas ats = "Atsakymas c="
-spausdink(ats)
-spausdink(padidintasC)
+//didinti(5)
+
+sveikuolis padidintasC = didinti(du, 5, 2) //kodel 2 kartus spausdina?
+//siulas ats = "Atsakymas c = " ++ padidintasC
+//spausdink(ats)
+
+func tustute(){
+  spausdink("nieko")
+}
+
+tustute()
+
+func maisalyne(sveikuolis a, siulas b){
+    spausdink(a)
+}
+
+//maisalyne("a", 2)
 
 jeigu(a>2)
 {

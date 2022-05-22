@@ -15,6 +15,7 @@ statement
  | stringDeclaration
  | decimalDeclaration
  | boolDeclaration
+ | intArrayDeclaration
  | assignment
  | functionDeclaration
  | functionCall
@@ -23,6 +24,8 @@ statement
  | ifElseStatement
  | visiemsStatement
  | kolStatement
+ | intArrayAdd
+ //| intArrayRemove
  | returnStatment
 
  ;
@@ -64,6 +67,21 @@ boolDeclaration
 : 'artikrai' IDENTIFIER '=' expression //|BOOLEAN
 ;
 
+intArrayDeclaration
+: 'sveikuolis[]' IDENTIFIER '=' 'new sveikuolis['INTEGER']'
+;
+
+intArrayAdd
+: IDENTIFIER'['INTEGER']''=' expression
+;
+
+intArrayGet
+: IDENTIFIER'['INTEGER']'
+;
+/*intArrayRemove
+: IDENTIFIER'.ismesti('expression')'
+;*/
+
 assignment
  : IDENTIFIER '=' expression    //#assignmentExpression
  ;
@@ -80,7 +98,7 @@ systemFunctionCall
  : PRINT '(' expression ')'                             #printFunctionCall
  ;
 
-ifElseStatement : 'jeigu' '(' expression ')' block ('kitaip' block)? ;
+ifElseStatement : 'jeigu' '(' expression ')' block ('kitaip' block)? ; //('kitaip jeigu' block)*
 
 kolStatement : 'kol' '(' expression ')' block;
 
@@ -107,6 +125,7 @@ expression //a=a-1
  |type                                                  #typeExpression
  | IDENTIFIER                                           #identifierExpression
  | '(' expression ')'                                   #parenthesesExpression
+ | intArrayGet                                          #intArrayGetExpression
  | booleanUnaryOp expression                            #booleanUnaryOpExpression
  | expression booleanBinaryOp expression                #booleanBinaryOpExpression
  | expression numericMultiOp expression                 #numericMultiOpExpression
@@ -126,13 +145,13 @@ numericAddOp : '+' | '--' ;
 
 numericCompareOp : '>' | '<' | '<=' | '>=' | '==' | '!=' ;
 
-stringBinaryOp : '+' ; //sujungti du strings
+stringBinaryOp : '++' ; //sujungti du strings
 
 PRINT : 'spausdink'; //spausdink
 
 INTEGER : [-][0-9]+ | [0-9]+ ; //TODO - support negative numbers - done?
 DECIMAL : [-][0-9]+ '.' [0-9]+ | [0-9]+ '.' [0-9]+ ;
-BOOLEAN : 'tiesa' | 'melas' ; //tiesa|melas
+BOOLEAN : 'true' | 'false' ; //tiesa|melas
 STRING : ["] ( ~["\r\n\\] | '\\' ~[\r\n] )* ["] ;
 
 IDENTIFIER : [&]?[a-zA-Z_][a-zA-Z_0-9]* ; //var name

@@ -1,9 +1,13 @@
 package org.BULVE.visitor;
 
+import org.BULVE.visitor.exception.BULVEArrayDeclarationExeption;
 import org.BULVE.visitor.exception.BULVEBadTypeException;
+import org.BULVE.visitor.exception.BULVEFunctionParametersExeption;
+import org.BULVE.visitor.exception.BULVEIndexOutsideTheBoundsOfTheArray;
 import org.antlr.v4.runtime.tree.RuleNode;
 
 import java.util.*;
+
 
 public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
 
@@ -28,7 +32,8 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
 
     @Override
     public Object visitPrintFunctionCall(BULVEParser.PrintFunctionCallContext ctx) {
-        String text = visit(ctx.expression()).toString();
+        String text0 = visit(ctx.expression()).toString();
+        String text = text0.replace("\"", "");
         System.out.println(text);
         SYSTEM_OUT.append(text).append("\n");
         return null;
@@ -67,30 +72,23 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     @Override
     public Object visitIntegerDeclaration(BULVEParser.IntegerDeclarationContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
-        try{
-                Integer value = Integer.parseInt(this.visit(ctx.expression()).toString());
-                this.currentScope.declareVariable(varName, value);
-                return value;
-        }
-        catch (BULVEBadTypeException ex)
+
+        if(this.visit(ctx.expression()) instanceof Integer)
         {
-            throw new BULVEBadTypeException(varName);
+            Integer value = Integer.parseInt(this.visit(ctx.expression()).toString());
+            this.currentScope.declareVariable(varName, value);
+            return value;
         }
+        else throw new BULVEBadTypeException(varName);
 
     }
     //TODO:VISIEM DECLARATION TIKRINT AR TEISINGAI PRISKIRTAS TIPAS, exeption sitas netinka
     @Override
     public Object visitStringDeclaration(BULVEParser.StringDeclarationContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
-        try{
-                String value = this.visit(ctx.expression()).toString();
-                this.currentScope.declareVariable(varName, value);
-                return value;
-    }
-        catch (BULVEBadTypeException ex)
-        {
-            throw new BULVEBadTypeException(varName);
-        }
+        String value = this.visit(ctx.expression()).toString();
+        this.currentScope.declareVariable(varName, value);
+        return value;
     }
 
     @Override
@@ -104,36 +102,29 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
     @Override
     public Object visitDecimalDeclaration(BULVEParser.DecimalDeclarationContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
-        try{
+        if(this.visit(ctx.expression()) instanceof Double)
+        {
                 Double value = Double.parseDouble(this.visit(ctx.expression()).toString());
                 this.currentScope.declareVariable(varName, value);
                 return value;
         }
-        catch (BULVEBadTypeException ex)
-        {
-            throw new BULVEBadTypeException(varName);
-        }
+        else throw new BULVEBadTypeException(varName);
     }
 
     @Override
     public Object visitBoolDeclaration(BULVEParser.BoolDeclarationContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
-        try{
-        Boolean value = Boolean.parseBoolean(this.visit(ctx.expression()).toString());
-        this.currentScope.declareVariable(varName, value);
-        return value;
+        if(this.visit(ctx.expression()) instanceof Boolean) {
+            Boolean value = Boolean.parseBoolean(this.visit(ctx.expression()).toString());
+            this.currentScope.declareVariable(varName, value);
+            return value;
         }
-        catch (BULVEBadTypeException ex)
-            {
-                throw new BULVEBadTypeException(varName);
-            }
-
+        else throw new BULVEBadTypeException(varName);
     }
 
     @Override
     public Object visitIdentifierExpression(BULVEParser.IdentifierExpressionContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
-
         Object value = this.currentScope.resolveVariable(varName);
         if(specialArgs.contains(varName))
         {
@@ -141,32 +132,155 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
         }
         return value;
     }
-    //TODO, kad jei sudeda int su decimal gautusi decimal, dar gal ++ su strings
     @Override
     public Object visitNumericAddOpExpression(BULVEParser.NumericAddOpExpressionContext ctx) {
         Object val1 = visit(ctx.expression(0));
         Object val2 = visit(ctx.expression(1));
-        //TODO - validation etc
-        return switch (ctx.numericAddOp().getText()) {
-            case "+" -> (Integer) val1 + (Integer) val2;
-            case "--" -> (Integer) val1 - (Integer) val2;
-            default -> null;
-        };
+        if(!(val1 instanceof String) && !(val1 instanceof Boolean) && !(val2 instanceof String) && !(val2 instanceof Boolean)) {
+            if (val1 instanceof Integer && val2 instanceof Integer) {
+                return switch (ctx.numericAddOp().getText()) {
+                    case "+" -> (Integer) val1 + (Integer) val2;
+                    case "--" -> (Integer) val1 - (Integer) val2;
+                    default -> null;
+                };
+            } else {
+                double val1d, val2d;
+                if (val1 instanceof Integer) {
+                    int val1i = Integer.parseInt(val1.toString());
+                    val1d = val1i;
+                } else {
+                    val1d = Double.parseDouble(val1.toString());
+                }
+
+                if (val2 instanceof Integer) {
+                    int val2i = Integer.parseInt(val2.toString());
+                    val2d = val2i;
+                } else {
+                    val2d = Double.parseDouble(val2.toString());
+                }
+                return switch (ctx.numericAddOp().getText()) {
+                    case "+" -> val2d + val1d;
+                    case "--" -> val1d - val2d;
+                    default -> null;
+                };
+            }
+        }
+        else if(val1 instanceof String || val1 instanceof Boolean)
+        {
+            throw new BULVEBadTypeException(val1.toString());
+        }
+        else
+        {
+            throw new BULVEBadTypeException(val2.toString());
+        }
     }
 
     @Override
     public Object visitNumericMultiOpExpression(BULVEParser.NumericMultiOpExpressionContext ctx) {
         Object val1 = visit(ctx.expression(0));
         Object val2 = visit(ctx.expression(1));
-        //TODO - validation etc
-        return switch (ctx.numericMultiOp().getText()) {
-            case "*" -> (Integer) val1 * (Integer) val2;
-            case "/" -> (Integer) val1 / (Integer) val2;
-            case "%" -> (Integer) val1 % (Integer) val2;
-            default -> null;
-        };
+        if(!(val1 instanceof String) && !(val1 instanceof Boolean) && !(val2 instanceof String) && !(val2 instanceof Boolean)) {
+            if (val1 instanceof Integer && val2 instanceof Integer) {
+                return switch (ctx.numericMultiOp().getText()) {
+                    case "*" -> (Integer) val1 * (Integer) val2;
+                    case "/" -> (Integer) val1 / (Integer) val2;
+                    case "%" -> (Integer) val1 % (Integer) val2;
+                    default -> null;
+                };
+            } else {
+                double val1d, val2d;
+                if (val1 instanceof Integer) {
+                    int val1i = Integer.parseInt(val1.toString());
+                    val1d = val1i;
+                } else {
+                    val1d = Double.parseDouble(val1.toString());
+                }
+
+                if (val2 instanceof Integer) {
+                    int val2i = Integer.parseInt(val2.toString());
+                    val2d = val2i;
+                } else {
+                    val2d = Double.parseDouble(val2.toString());
+                }
+                return switch (ctx.numericMultiOp().getText()) {
+                    case "*" -> val1d * val2d;
+                    case "/" -> val1d / val2d;
+                    case "%" -> val1d % val2d;
+                    default -> null;
+                };
+            }
+        }
+        else if(val1 instanceof String || val1 instanceof Boolean)
+        {
+            throw new BULVEBadTypeException(val1.toString());
+        }
+        else
+        {
+            throw new BULVEBadTypeException(val2.toString());
+        }
     }
 
+    @Override
+    public Object visitIntArrayDeclaration(BULVEParser.IntArrayDeclarationContext ctx) {
+        String arrName = ctx.IDENTIFIER().getText();
+        Object sizeo = ctx.INTEGER();
+        //if(sizeo instanceof Integer)
+        {
+            Integer size = Integer.parseInt(ctx.INTEGER().getText());
+            int[] arr = new int[size];
+            this.currentScope.declareVariable(arrName, arr);
+            return arr;
+        }
+        //else throw new BULVEArrayDeclarationExeption(arrName);
+
+    }
+
+    @Override
+    public Object visitIntArrayAdd(BULVEParser.IntArrayAddContext ctx) {
+        String arrName = ctx.IDENTIFIER().getText();
+        if(visit(ctx.expression()) instanceof Integer)
+        {
+            Integer value = Integer.parseInt(visit(ctx.expression()).toString());
+            //pasiimt is scope
+            int[] arr = (int[])this.currentScope.resolveVariable(arrName);
+            int index = Integer.parseInt(ctx.INTEGER().getText());
+            if(index>arr.length || index<0)
+            {
+                throw new BULVEIndexOutsideTheBoundsOfTheArray(arrName);
+            }
+            else{
+                arr[index]=value;
+                this.currentScope.changeVariable(arrName, arr);
+            }
+            return arr;
+        }
+        else throw new BULVEBadTypeException(arrName);
+
+    }
+
+    @Override
+    public Object visitIntArrayGet(BULVEParser.IntArrayGetContext ctx) {
+        String arrName = ctx.IDENTIFIER().getText();
+        int[] arr = (int[])this.currentScope.resolveVariable(arrName);
+        //Object indexo = ctx.INTEGER();
+       // if(indexo instanceof Integer)
+        {
+            int index = Integer.parseInt(ctx.INTEGER().getText());
+            if(index>arr.length || index<0)
+            {
+                throw new BULVEIndexOutsideTheBoundsOfTheArray(arrName);
+            }
+            else{
+                return arr[index];
+            }
+
+        }
+        //else throw new BULVEBadTypeException(indexo.toString());
+
+    }
+
+
+    //TODO: elseif
     @Override
     public Object visitIfElseStatement(BULVEParser.IfElseStatementContext ctx) {
         boolean value = (Boolean) visit(ctx.expression());
@@ -223,6 +337,14 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
             case "!=" -> (Integer) val1 != (Integer) val2;
             default -> null;
         };
+    }
+
+    @Override
+    public Object visitStringBinaryOpExpression(BULVEParser.StringBinaryOpExpressionContext ctx) {
+        String first = visit(ctx.expression(0)).toString();
+        String second = visit(ctx.expression(1)).toString();
+        String both = first+second;
+        return both;
     }
 
     @Override
@@ -287,12 +409,9 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
         return ctx.getText();
     }
 
-    //TODO implement nested functions
     @Override
     public Object visitFunctionDeclaration(BULVEParser.FunctionDeclarationContext ctx) {
         String funcName = ctx.IDENTIFIER().getText();
-
-
         this.functions.put(funcName, ctx);
         // create function class that has constructor(FunctionDeclarationContext), Invoke method
         // validations
@@ -315,7 +434,18 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
         String funcName = ctx.IDENTIFIER().getText();
         BULVEParser.FunctionDeclarationContext func = this.functions.get(funcName);
 
-        //TODO: check if args count is the same - ar istrauktoj funkcijoj toks pat kiekis kaip ir call'e
+        if(func.paramList()!=null) {
+            if (func.paramList().IDENTIFIER().size() != ctx.expressionList().expression().size())
+            {
+                throw new BULVEFunctionParametersExeption(funcName);
+            }
+        }
+        else {
+            if(ctx.expressionList()!=null)
+            {
+                throw new BULVEFunctionParametersExeption(funcName);
+            }
+        }
         List<Object> args = new ArrayList<>();
         if(ctx.expressionList()!=null)
         {
@@ -324,21 +454,60 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
                 args.add(this.visit(exp));
             }
         }
-        //TODO: validate args types
         BULVEScope functionScope = new BULVEScope();
         if(func.paramList()!=null) {
             for (int i = 0; i < func.paramList().IDENTIFIER().size(); i++) {
+                String type = visitType(func.paramList().type(i)).toString();
                 String paramName = func.paramList().IDENTIFIER(i).getText();
+                Object arg = args.get(i);
                 if(paramName.charAt(0)=='&')
                 {
                     String identReal = paramName.substring(1); //real varname
                     specialArgs.add(identReal);
-                    functionScope.declareVariable(identReal, args.get(i)); //special
+                    if(type.equals("siulas")) {
+                        if(arg instanceof String) {
+                            functionScope.declareVariable(identReal, args.get(i)); //special
+                        }
+                        else throw new BULVEBadTypeException(identReal);}
+                    else if(type.equals("sveikuolis")) {
+                        if(arg instanceof Integer) {
+                            functionScope.declareVariable(identReal, args.get(i)); //special
+                        }
+                        else throw new BULVEBadTypeException(identReal);}
+                    else if(type.equals("dvigubas")) {
+                        if(arg instanceof Double){
+                            functionScope.declareVariable(identReal, args.get(i)); //special
+                        }
+                        else throw new BULVEBadTypeException(identReal);}
+                    else if(type.equals("artikrai")) {
+                        if(arg instanceof Boolean) {
+                            functionScope.declareVariable(identReal, args.get(i)); //special
+                        }
+                        else throw new BULVEBadTypeException(identReal);}
+                    else throw new BULVEFunctionParametersExeption(funcName);
                 }
-                else functionScope.declareVariable(paramName, args.get(i)); //susieja declaration su call'o argumentais
+                else {
+                    if (type.equals("siulas")) {
+                        if (arg instanceof String) {
+                            functionScope.declareVariable(paramName, arg);
+                        } else throw new BULVEBadTypeException(paramName);
+                    } else if (type.equals("sveikuolis")) {
+                        if (arg instanceof Integer) {
+                            functionScope.declareVariable(paramName, arg);
+                        } else throw new BULVEBadTypeException(paramName);
+                    } else if (type.equals("dvigubas")) {
+                        if (arg instanceof Double) {
+                            functionScope.declareVariable(paramName, arg);
+                        } else throw new BULVEBadTypeException(paramName);
+                    } else if (type.equals("artikrai")) {
+                        if (arg instanceof Boolean) {
+                            functionScope.declareVariable(paramName, arg);
+                        } else throw new BULVEBadTypeException(paramName);
+                    }
+                    else throw new BULVEFunctionParametersExeption(funcName);
+                }
             }
         }
-        //sitoj vietoj scope kitoks jei funkcija funkcijoj? o gal ne
         scopeStack.push(currentScope);
         currentScope = functionScope;
         returnValue value = (returnValue)this.visitFunctionBody(func.functionBody());
@@ -357,7 +526,6 @@ public class BULVEVisitorImpl extends BULVEBaseVisitor<Object> {
             return new returnValue(this.visit(ctx.expression()));
         }
     }
-
 
     @Override
     protected boolean shouldVisitNextChild(RuleNode node, Object currentResult) {
